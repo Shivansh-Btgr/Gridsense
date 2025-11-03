@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UXsim Real-World Scenarios - Smart Traffic</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/uxsim-scenarios.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+</head>
+<body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-traffic-light"></i>
+                <span>Smart Traffic</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/dashboard" class="nav-item">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/label-video" class="nav-item">
+                <i class="fas fa-video"></i>
+                <span>Label Video</span>
+            </a>
+            <a href="/optimize-signals" class="nav-item">
+                <i class="fas fa-brain"></i>
+                <span>Optimize Signals</span>
+            </a>
+            <a href="/uxsim-scenarios" class="nav-item active">
+                <i class="fas fa-globe"></i>
+                <span>Real-World Scenarios</span>
+            </a>
+            <a href="#" class="nav-item disabled">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+                <span class="badge-small">Soon</span>
+            </a>
+            <a href="#" class="nav-item disabled">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+                <span class="badge-small">Soon</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/dashboard" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="dashboard-header">
+            <h1>🌍 Real-World Traffic Scenarios</h1>
+            <div class="breadcrumb">
+                <a href="/dashboard">Dashboard</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>UXsim Scenarios</span>
+            </div>
+        </header>
+
+        <div class="uxsim-container">
+            <!-- Mode Selector -->
+            <div class="mode-selector">
+                <div class="mode-btn active" onclick="switchMode('preset')">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <h3>Preset Locations</h3>
+                    <p>Choose from famous cities</p>
+                </div>
+                <div class="mode-btn" onclick="switchMode('custom')">
+                    <i class="fas fa-draw-polygon"></i>
+                    <h3>Custom Location</h3>
+                    <p>Select any area on map</p>
+                </div>
+            </div>
+
+            <!-- Preset Mode -->
+            <div class="preset-section" id="presetSection">
+                <h2>🏙️ Select a City</h2>
+                <div class="presets-grid" id="presetsGrid">
+                    <!-- Will be populated by JavaScript -->
+                    <div class="skeleton-loader"></div>
+                </div>
+            </div>
+
+            <!-- Custom Map Mode -->
+            <div class="map-section" id="mapSection">
+                <h2>🗺️ Draw Your Area</h2>
+                <div class="map-container">
+                    <div id="map"></div>
+                    <div class="map-instructions">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>How to use:</strong> Click "Draw Rectangle" button on the map, then drag to select your area. 
+                        The selected area will automatically be used for simulation.
+                    </div>
+                    <div class="bounds-display" id="boundsDisplay" style="display: none;">
+                        <strong>Selected Bounds:</strong><br>
+                        North: <span id="boundNorth">-</span> | South: <span id="boundSouth">-</span><br>
+                        East: <span id="boundEast">-</span> | West: <span id="boundWest">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simulation Configuration -->
+            <div class="config-section">
+                <h2>⚙️ Simulation Parameters</h2>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label for="duration">Duration (seconds)</label>
+                        <input type="number" id="duration" value="3600" min="600" max="7200" step="600">
+                        <small>Simulation time (600s = 10min, 3600s = 1hr)</small>
+                    </div>
+                    <div class="config-item">
+                        <label for="demand">Traffic Demand (vehicles/hour)</label>
+                        <input type="number" id="demand" value="3000" min="500" max="10000" step="500">
+                        <small>Number of vehicles entering the network</small>
+                    </div>
+                    <div class="config-item">
+                        <label for="roadFilter">Road Types</label>
+                        <select id="roadFilter">
+                            <option value='["highway"~"motorway"]'>Highways Only</option>
+                            <option value='["highway"~"primary|secondary"]' selected>Major Roads</option>
+                            <option value='["highway"~"primary|secondary|tertiary"]'>All Main Roads</option>
+                        </select>
+                        <small>Which types of roads to include</small>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-large" onclick="runSimulation()" style="margin-top: 2rem;">
+                    <i class="fas fa-play"></i> Run Simulation
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection">
+                <div class="results-header">
+                    <h2>📊 Simulation Results</h2>
+                    <button class="btn btn-secondary" onclick="resetSimulation()">
+                        <i class="fas fa-redo"></i> Run Another
+                    </button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div class="stat-value" id="statNodes">-</div>
+                        <div class="stat-label">Network Nodes</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-road"></i>
+                        <div class="stat-value" id="statLinks">-</div>
+                        <div class="stat-label">Road Links</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-car"></i>
+                        <div class="stat-value" id="statTrips">-</div>
+                        <div class="stat-label">Total Trips</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <div class="stat-value" id="statSpeed">-</div>
+                        <div class="stat-label">Avg Speed (km/h)</div>
+                    </div>
+                </div>
+
+                <div class="animations-section">
+                    <h3>🎬 Network Animations</h3>
+                    <div class="animation-grid" id="animationGrid">
+                        <!-- Will be populated with animations -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Running Simulation...</div>
+            <div class="loading-subtext" id="loadingSubtext">
+                This may take 2-5 minutes. Downloading OpenStreetMap data and simulating traffic...
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="{{ url_for('static', filename='js/uxsim-scenarios.js') }}"></script>
+</body>
+</html>

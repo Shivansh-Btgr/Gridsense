@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimize Traffic Signals - Smart Traffic</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/optimize-signals.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-traffic-light"></i>
+                <span>Smart Traffic</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/dashboard" class="nav-item">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/label-video" class="nav-item">
+                <i class="fas fa-video"></i>
+                <span>Label Video</span>
+            </a>
+            <a href="/optimize-signals" class="nav-item active">
+                <i class="fas fa-brain"></i>
+                <span>Optimize Signals</span>
+            </a>
+            <a href="/uxsim-scenarios" class="nav-item">
+                <i class="fas fa-globe"></i>
+                <span>Real-World Scenarios</span>
+            </a>
+            <a href="#" class="nav-item disabled">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+                <span class="badge-small">Soon</span>
+            </a>
+            <a href="#" class="nav-item disabled">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+                <span class="badge-small">Soon</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/dashboard" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="dashboard-header">
+            <h1>Optimize Traffic Signals</h1>
+            <div class="breadcrumb">
+                <a href="/dashboard">Dashboard</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Optimize Signals</span>
+            </div>
+        </header>
+
+        <div class="optimize-container">
+            {% if not sumo_available %}
+            <!-- SUMO Not Available Warning -->
+            <div class="warning-card">
+                <div class="warning-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>SUMO Environment Not Configured</h3>
+                <p>The SUMO traffic simulator is required for this feature but is not currently available.</p>
+                <div class="installation-steps">
+                    <h4>To enable this feature:</h4>
+                    <ol>
+                        <li>Install SUMO from <a href="https://www.eclipse.org/sumo/" target="_blank">eclipse.org/sumo</a></li>
+                        <li>Set the SUMO_HOME environment variable</li>
+                        <li>Install Python dependencies: <code>pip install sumo-rl</code></li>
+                        <li>Restart the Flask server</li>
+                    </ol>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Network Selection Section -->
+            <div class="network-section">
+                <h2>🗺️ Select Network Scenario</h2>
+                <div class="scenario-grid" id="scenarioGrid">
+                    {% if scenarios %}
+                        {% for id, info in scenarios.items() %}
+                        <div class="scenario-card" data-scenario="{{ id }}" {% if loop.first %}class="selected"{% endif %}>
+                            <div class="scenario-header">
+                                <h3>{{ info.name }}</h3>
+                                <span class="difficulty-badge difficulty-{{ info.difficulty.lower().replace(' ', '-') }}">
+                                    {{ info.difficulty }}
+                                </span>
+                            </div>
+                            <p class="scenario-desc">{{ info.description }}</p>
+                            {% if not info.built_in %}
+                            <span class="custom-badge">Custom</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color: rgba(255,255,255,0.6);">No scenarios available. SUMO may not be configured.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Grid Generator -->
+                <div class="grid-generator">
+                    <h3>Or Create Custom Grid Network</h3>
+                    <div class="grid-controls">
+                        <div class="form-group">
+                            <label>Rows:</label>
+                            <input type="number" id="gridRows" min="1" max="5" value="2" {% if not sumo_available %}disabled{% endif %}>
+                        </div>
+                        <div class="form-group">
+                            <label>Columns:</label>
+                            <input type="number" id="gridCols" min="1" max="5" value="2" {% if not sumo_available %}disabled{% endif %}>
+                        </div>
+                        <div class="form-group">
+                            <label>Name:</label>
+                            <input type="text" id="gridName" placeholder="my_network" value="custom_grid" {% if not sumo_available %}disabled{% endif %}>
+                        </div>
+                        <button class="btn btn-secondary" onclick="generateGrid()" {% if not sumo_available %}disabled{% endif %}>
+                            <i class="fas fa-th"></i> Generate Grid
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid rgba(255,255,255,0.1);">
+
+            <!-- Configuration Section -->
+            <div class="config-section">
+                <div class="config-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-sliders-h"></i> Simulation Configuration</h2>
+                        <p>Configure reinforcement learning parameters for traffic signal optimization</p>
+                    </div>
+
+                    <form id="simulationForm" {% if not sumo_available %}disabled{% endif %}>
+                        <div class="form-grid">
+                            <!-- Basic Settings -->
+                            <div class="form-section">
+                                <h3>Basic Settings</h3>
+                                <div class="form-group">
+                                    <label for="episodes">
+                                        <i class="fas fa-redo"></i> Training Episodes
+                                        <span class="tooltip" title="Number of simulation episodes to run">?</span>
+                                    </label>
+                                    <input type="number" id="episodes" name="episodes" value="50" min="1" max="200" {% if not sumo_available %}disabled{% endif %}>
+                                    <small>Recommended: 50-100 episodes</small>
+                                </div>
+                            </div>
+
+                            <!-- RL Hyperparameters -->
+                            <div class="form-section">
+                                <h3>Learning Parameters</h3>
+                                <div class="form-group">
+                                    <label for="alpha">
+                                        <i class="fas fa-tachometer-alt"></i> Learning Rate (α)
+                                        <span class="tooltip" title="How quickly the agent learns from new experiences">?</span>
+                                    </label>
+                                    <input type="number" id="alpha" name="alpha" value="0.00001" step="0.00001" min="0.00001" max="1" {% if not sumo_available %}disabled{% endif %}>
+                                    <small>Range: 0.00001 to 1.0</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="gamma">
+                                        <i class="fas fa-chart-line"></i> Discount Factor (γ)
+                                        <span class="tooltip" title="How much the agent values future rewards">?</span>
+                                    </label>
+                                    <input type="number" id="gamma" name="gamma" value="0.95" step="0.05" min="0" max="1" {% if not sumo_available %}disabled{% endif %}>
+                                    <small>Range: 0.0 to 1.0</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="epsilon">
+                                        <i class="fas fa-random"></i> Exploration Rate (ε)
+                                        <span class="tooltip" title="Probability of taking random actions">?</span>
+                                    </label>
+                                    <input type="number" id="epsilon" name="epsilon" value="0.05" step="0.01" min="0" max="1" {% if not sumo_available %}disabled{% endif %}>
+                                    <small>Range: 0.0 to 1.0</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="lambda">
+                                        <i class="fas fa-wave-square"></i> Eligibility Trace (λ)
+                                        <span class="tooltip" title="How much past states influence learning">?</span>
+                                    </label>
+                                    <input type="number" id="lambda" name="lambda" value="0.1" step="0.1" min="0" max="1" {% if not sumo_available %}disabled{% endif %}>
+                                    <small>Range: 0.0 to 1.0</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="fourier_order">
+                                        <i class="fas fa-wave-square"></i> Fourier Order
+                                        <span class="tooltip" title="Complexity of feature representation">?</span>
+                                    </label>
+                                    <input type="number" id="fourier_order" name="fourier_order" value="2" min="1" max="3" {% if not sumo_available %}disabled{% endif %}>
+                                    <small>Range: 1 to 3 (lower is faster)</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-large" {% if not sumo_available %}disabled{% endif %}>
+                                <i class="fas fa-play"></i> Start Optimization
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                                <i class="fas fa-undo"></i> Reset to Defaults
+                            </button>
+                        </div>
+                        
+                        <div class="live-sim-section">
+                            <hr style="margin: 2rem 0; border-color: var(--border-color);">
+                            <div class="live-sim-info">
+                                <h4><i class="fas fa-tv"></i> Want to See Live Simulation?</h4>
+                                <p>You can run the simulation with SUMO GUI visible on your desktop!</p>
+                                <button type="button" class="btn btn-success" onclick="openSUMOGUI()" {% if not sumo_available %}disabled{% endif %}>
+                                    <i class="fas fa-desktop"></i> Open SUMO GUI Simulation
+                                </button>
+                                <small style="display: block; margin-top: 1rem; color: var(--text-secondary);">
+                                    <i class="fas fa-info-circle"></i> This will open a separate window showing the traffic simulation in real-time
+                                </small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Info Panel -->
+                <div class="info-panel">
+                    <div class="info-card">
+                        <h3><i class="fas fa-info-circle"></i> About This Feature</h3>
+                        <p>This tool uses <strong>reinforcement learning</strong> to optimize traffic signal timing for the Cologne8 intersection.</p>
+                        <ul class="info-list">
+                            <li><i class="fas fa-check"></i> Simulates real traffic scenarios</li>
+                            <li><i class="fas fa-check"></i> Learns optimal signal timing</li>
+                            <li><i class="fas fa-check"></i> Minimizes wait times</li>
+                            <li><i class="fas fa-check"></i> Reduces congestion</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card">
+                        <h3><i class="fas fa-graduation-cap"></i> How It Works</h3>
+                        <div class="process-steps">
+                            <div class="process-step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <strong>Initialize</strong>
+                                    <p>Create SUMO environment and RL agents</p>
+                                </div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <strong>Learn</strong>
+                                    <p>Agents learn from traffic patterns</p>
+                                </div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <strong>Optimize</strong>
+                                    <p>Find best signal timing strategies</p>
+                                </div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <strong>Results</strong>
+                                    <p>View performance metrics</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3><i class="fas fa-chart-bar"></i> Metrics Tracked</h3>
+                        <div class="metrics-list">
+                            <div class="metric-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Average Wait Time</span>
+                            </div>
+                            <div class="metric-item">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Average Speed</span>
+                            </div>
+                            <div class="metric-item">
+                                <i class="fas fa-car"></i>
+                                <span>Total Vehicles Stopped</span>
+                            </div>
+                            <div class="metric-item">
+                                <i class="fas fa-trophy"></i>
+                                <span>Cumulative Reward</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Section -->
+            <div id="progressSection" class="progress-section" style="display: none;">
+                <div class="progress-card">
+                    <div class="progress-header">
+                        <h3>Running Simulation</h3>
+                        <div class="loader"></div>
+                    </div>
+                    <p class="progress-subtitle">Training reinforcement learning agents...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p id="progressText">Initializing environment...</p>
+                    <div class="progress-stats">
+                        <div class="stat">
+                            <strong id="currentEpisode">0</strong>
+                            <span>Current Episode</span>
+                        </div>
+                        <div class="stat">
+                            <strong id="totalEpisodes">0</strong>
+                            <span>Total Episodes</span>
+                        </div>
+                        <div class="stat">
+                            <strong id="progressPercent">0%</strong>
+                            <span>Progress</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="results-section" style="display: none;">
+                <div class="results-card">
+                    <div class="results-header">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h2>Optimization Complete!</h2>
+                        <p>Traffic signal timing has been successfully optimized</p>
+                    </div>
+
+                    <div class="results-grid">
+                        <div class="result-metric">
+                            <div class="metric-icon blue">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3 id="totalReward">0</h3>
+                                <p>Total Reward</p>
+                            </div>
+                        </div>
+                        <div class="result-metric">
+                            <div class="metric-icon green">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3 id="avgReward">0</h3>
+                                <p>Average Reward</p>
+                            </div>
+                        </div>
+                        <div class="result-metric">
+                            <div class="metric-icon purple">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3 id="avgWaitTime">N/A</h3>
+                                <p>Avg Wait Time (s)</p>
+                            </div>
+                        </div>
+                        <div class="result-metric">
+                            <div class="metric-icon orange">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3 id="avgSpeed">N/A</h3>
+                                <p>Avg Speed (m/s)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <h3>Learning Progress</h3>
+                        <canvas id="rewardChart"></canvas>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="btn btn-primary" onclick="resetSimulation()">
+                            <i class="fas fa-redo"></i> Run Another Simulation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="{{ url_for('static', filename='js/optimize-signals.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+/* UXsim Scenarios Page Styles */
+
+.uxsim-container {
+    padding: 2rem;
+}
+
+.mode-selector {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.mode-btn:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.mode-btn.active {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(255, 20, 147, 0.1));
+}
+
+.mode-btn i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.mode-btn h3 {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.mode-btn p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #888;
+}
+
+/* Preset Locations */
+.presets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.preset-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.preset-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(138, 43, 226, 0.3);
+}
+
+.preset-card.selected {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(255, 20, 147, 0.1));
+}
+
+.preset-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.preset-icon {
+    font-size: 1.5rem;
+}
+
+.preset-card h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.preset-meta {
+    display: flex;
+    gap: 1rem;
+    margin: 0.5rem 0;
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.preset-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.preset-card p {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+/* Map Section */
+.map-section {
+    display: none;
+}
+
+.map-section.active {
+    display: block;
+}
+
+.map-container {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+#map {
+    height: 500px;
+    width: 100%;
+    border-radius: 8px;
+    background: #1a1a2e;
+    z-index: 1;
+}
+
+/* Fix for Leaflet tiles not loading */
+.leaflet-container {
+    background: #1a1a2e;
+}
+
+.leaflet-tile-pane {
+    opacity: 1 !important;
+}
+
+.map-instructions {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(138, 43, 226, 0.1);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.map-instructions i {
+    color: var(--primary-color);
+    margin-right: 0.5rem;
+}
+
+.bounds-display {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+}
+
+/* Simulation Config */
+.config-section {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.config-item label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #ddd;
+}
+
+.config-item input,
+.config-item select {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+}
+
+.config-item input:focus,
+.config-item select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.config-item small {
+    display: block;
+    margin-top: 0.25rem;
+    color: #888;
+    font-size: 0.85rem;
+}
+
+/* Results Section */
+.results-section {
+    display: none;
+}
+
+.results-section.show {
+    display: block;
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 0.5rem 0;
+}
+
+.stat-label {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.animations-section {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 12px;
+}
+
+.animation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.animation-item {
+    text-align: center;
+}
+
+.animation-item img,
+.animation-item video {
+    width: 100%;
+    border-radius: 8px;
+    border: 2px solid rgba(138, 43, 226, 0.3);
+}
+
+.animation-item h4 {
+    margin: 1rem 0 0.5rem 0;
+}
+
+.download-btn {
+    margin-top: 1rem;
+}
+
+/* Loading State */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay.show {
+    display: flex;
+}
+
+.loading-content {
+    text-align: center;
+    padding: 3rem;
+    background: var(--card-bg);
+    border-radius: 16px;
+    max-width: 500px;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(138, 43, 226, 0.3);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1.5rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.loading-subtext {
+    color: #888;
+    font-size: 0.9rem;
+}

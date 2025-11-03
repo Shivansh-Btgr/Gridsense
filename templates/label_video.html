@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Label Video - Smart Traffic</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/label-video.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-traffic-light"></i>
+                <span>Smart Traffic</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/dashboard" class="nav-item">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/label-video" class="nav-item active">
+                <i class="fas fa-video"></i>
+                <span>Label Video</span>
+            </a>
+            <a href="/optimize-signals" class="nav-item">
+                <i class="fas fa-traffic-light"></i>
+                <span>Optimize Signals</span>
+            </a>
+            <a href="/uxsim-scenarios" class="nav-item">
+                <i class="fas fa-globe"></i>
+                <span>Real-World Scenarios</span>
+            </a>
+            <a href="#" class="nav-item disabled">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+                <span class="badge-small">Soon</span>
+            </a>
+            <a href="#" class="nav-item disabled">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+                <span class="badge-small">Soon</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/dashboard" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="dashboard-header">
+            <h1>Label Your Video</h1>
+            <div class="breadcrumb">
+                <a href="/dashboard">Dashboard</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Label Video</span>
+            </div>
+        </header>
+
+        <div class="label-video-container">
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <div class="upload-card">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h2>Upload Your Traffic Video</h2>
+                    <p>Drag and drop your video file or click to browse</p>
+                    
+                    <div class="file-input-wrapper">
+                        <input type="file" id="videoInput" accept="video/mp4,video/avi,video/mov,video/mkv" hidden>
+                        <button class="btn btn-primary btn-large" onclick="document.getElementById('videoInput').click()">
+                            <i class="fas fa-folder-open"></i> Choose Video File
+                        </button>
+                    </div>
+
+                    <div class="file-info">
+                        <p class="supported-formats">
+                            <i class="fas fa-info-circle"></i>
+                            Supported formats: MP4, AVI, MOV, MKV (Max 500MB)
+                        </p>
+                    </div>
+
+                    <div id="selectedFile" class="selected-file" style="display: none;">
+                        <div class="file-details">
+                            <i class="fas fa-file-video"></i>
+                            <div class="file-text">
+                                <strong id="fileName"></strong>
+                                <span id="fileSize"></span>
+                            </div>
+                            <button class="btn-remove" onclick="removeFile()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button id="processBtn" class="btn btn-success btn-large" style="display: none;" onclick="processVideo()">
+                        <i class="fas fa-magic"></i> Process Video with AI
+                    </button>
+                </div>
+
+                <!-- Progress Section -->
+                <div id="progressSection" class="progress-section" style="display: none;">
+                    <div class="progress-card">
+                        <div class="progress-header">
+                            <h3>Processing Your Video</h3>
+                            <div class="loader"></div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <p id="progressText">Uploading video...</p>
+                        <div class="processing-steps">
+                            <div class="step" id="step1">
+                                <i class="fas fa-upload"></i>
+                                <span>Uploading</span>
+                            </div>
+                            <div class="step" id="step2">
+                                <i class="fas fa-brain"></i>
+                                <span>Analyzing</span>
+                            </div>
+                            <div class="step" id="step3">
+                                <i class="fas fa-video"></i>
+                                <span>Labeling</span>
+                            </div>
+                            <div class="step" id="step4">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Complete</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result Section -->
+                <div id="resultSection" class="result-section" style="display: none;">
+                    <div class="result-card success">
+                        <div class="result-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3>Video Processed Successfully!</h3>
+                        <p id="resultMessage"></p>
+                        <div class="result-actions">
+                            <button class="btn btn-primary btn-large" onclick="downloadVideo()">
+                                <i class="fas fa-download"></i> Download Labeled Video
+                            </button>
+                            <button class="btn btn-secondary" onclick="resetForm()">
+                                <i class="fas fa-redo"></i> Process Another Video
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Section -->
+                <div id="errorSection" class="result-section" style="display: none;">
+                    <div class="result-card error">
+                        <div class="result-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <h3>Processing Failed</h3>
+                        <p id="errorMessage"></p>
+                        <button class="btn btn-primary" onclick="resetForm()">
+                            <i class="fas fa-redo"></i> Try Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="info-section">
+                <div class="info-card">
+                    <h3><i class="fas fa-info-circle"></i> How It Works</h3>
+                    <ul class="info-list">
+                        <li>
+                            <i class="fas fa-check"></i>
+                            Upload your traffic video (up to 500MB)
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            Our AI analyzes each frame using YOLOv8
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            Objects are detected and labeled automatically
+                        </li>
+                        <li>
+                            <i class="fas fa-check"></i>
+                            Download your processed video with labels
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="fas fa-eye"></i> Detection Capabilities</h3>
+                    <div class="detection-tags">
+                        <span class="tag">Cars</span>
+                        <span class="tag">Trucks</span>
+                        <span class="tag">Buses</span>
+                        <span class="tag">Motorcycles</span>
+                        <span class="tag">Bicycles</span>
+                        <span class="tag">Pedestrians</span>
+                        <span class="tag">Traffic Lights</span>
+                        <span class="tag">Stop Signs</span>
+                        <span class="tag">And more...</span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="fas fa-rocket"></i> Features</h3>
+                    <ul class="feature-list">
+                        <li>
+                            <i class="fas fa-bolt"></i>
+                            <div>
+                                <strong>Fast Processing</strong>
+                                <p>Optimized for speed and accuracy</p>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fas fa-brain"></i>
+                            <div>
+                                <strong>Advanced ML</strong>
+                                <p>Powered by YOLOv8 neural network</p>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fas fa-chart-line"></i>
+                            <div>
+                                <strong>High Accuracy</strong>
+                                <p>99% detection accuracy</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/label-video.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Smart Traffic</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-traffic-light"></i>
+                <span>Smart Traffic</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/dashboard" class="nav-item active">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/label-video" class="nav-item">
+                <i class="fas fa-video"></i>
+                <span>Label Video</span>
+            </a>
+            <a href="/optimize-signals" class="nav-item">
+                <i class="fas fa-brain"></i>
+                <span>Optimize Signals</span>
+            </a>
+            <a href="/uxsim-scenarios" class="nav-item">
+                <i class="fas fa-globe"></i>
+                <span>Real-World Scenarios</span>
+            </a>
+            <a href="#" class="nav-item disabled">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+                <span class="badge-small">Soon</span>
+            </a>
+            <a href="#" class="nav-item disabled">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+                <span class="badge-small">Soon</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="dashboard-header">
+            <h1>Dashboard</h1>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span>Welcome</span>
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-icon blue">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <div class="stat-card-content">
+                        <h3>0</h3>
+                        <p>Videos Processed</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon green">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="stat-card-content">
+                        <h3>0</h3>
+                        <p>Objects Detected</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon purple">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-card-content">
+                        <h3>0h</h3>
+                        <p>Processing Time</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon orange">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="stat-card-content">
+                        <h3>99%</h3>
+                        <p>Accuracy</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="features-section">
+                <h2>Available Features</h2>
+                <div class="dashboard-features-grid">
+                    <a href="/label-video" class="dashboard-feature-card">
+                        <div class="feature-card-header">
+                            <div class="feature-card-icon">
+                                <i class="fas fa-video"></i>
+                            </div>
+                            <span class="status-badge active">Active</span>
+                        </div>
+                        <h3>Label Your Video</h3>
+                        <p>Upload traffic videos and automatically detect and label vehicles, pedestrians, and other objects using advanced ML models.</p>
+                        <div class="feature-card-footer">
+                            <span class="feature-tag">
+                                <i class="fas fa-brain"></i> AI-Powered
+                            </span>
+                            <span class="feature-tag">
+                                <i class="fas fa-bolt"></i> Fast
+                            </span>
+                        </div>
+                        <div class="card-action">
+                            <span>Start Labeling</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
+
+                    <a href="/optimize-signals" class="dashboard-feature-card">
+                        <div class="feature-card-header">
+                            <div class="feature-card-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <span class="status-badge active">Active</span>
+                        </div>
+                        <h3>Optimize Traffic Signals</h3>
+                        <p>Use reinforcement learning to optimize traffic signal timing, minimize wait times, and reduce congestion with SUMO simulation.</p>
+                        <div class="feature-card-footer">
+                            <span class="feature-tag">
+                                <i class="fas fa-graduation-cap"></i> RL-Powered
+                            </span>
+                            <span class="feature-tag">
+                                <i class="fas fa-traffic-light"></i> SUMO
+                            </span>
+                        </div>
+                        <div class="card-action">
+                            <span>Start Optimizing</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
+
+                    <a href="/uxsim-scenarios" class="dashboard-feature-card">
+                        <div class="feature-card-header">
+                            <div class="feature-card-icon">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <span class="status-badge active">New!</span>
+                        </div>
+                        <h3>Real-World Scenarios</h3>
+                        <p>Simulate traffic on real road networks from OpenStreetMap. Choose preset cities or draw custom areas.</p>
+                        <div class="feature-card-footer">
+                            <span class="feature-tag">
+                                <i class="fas fa-map"></i> OpenStreetMap
+                            </span>
+                            <span class="feature-tag">
+                                <i class="fas fa-city"></i> UXsim
+                            </span>
+                        </div>
+                        <div class="card-action">
+                            <span>Explore Cities</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
+
+                    <div class="dashboard-feature-card disabled">
+                        <div class="feature-card-header">
+                            <div class="feature-card-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <span class="status-badge coming">Coming Soon</span>
+                        </div>
+                        <h3>Traffic Analytics</h3>
+                        <p>Analyze traffic patterns, peak hours, and vehicle distribution with comprehensive data visualization.</p>
+                        <div class="feature-card-footer">
+                            <span class="feature-tag">
+                                <i class="fas fa-chart-bar"></i> Analytics
+                            </span>
+                            <span class="feature-tag">
+                                <i class="fas fa-calendar"></i> Historical
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-feature-card disabled">
+                        <div class="feature-card-header">
+                            <div class="feature-card-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <span class="status-badge coming">Coming Soon</span>
+                        </div>
+                        <h3>Incident Detection</h3>
+                        <p>Automatically detect accidents, traffic violations, and unusual events in real-time video streams.</p>
+                        <div class="feature-card-footer">
+                            <span class="feature-tag">
+                                <i class="fas fa-bell"></i> Alerts
+                            </span>
+                            <span class="feature-tag">
+                                <i class="fas fa-clock"></i> Real-time
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Start Guide -->
+            <div class="quick-start">
+                <h2>Quick Start Guide</h2>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h4>Upload Video</h4>
+                        <p>Click on "Label Your Video" and upload your traffic footage</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h4>AI Processing</h4>
+                        <p>Our ML model analyzes each frame and detects objects</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h4>Download Results</h4>
+                        <p>Get your labeled video with all objects identified</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
