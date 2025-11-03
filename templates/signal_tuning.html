@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signal Timing Optimization - Smart Traffic</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/uxsim-scenarios.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <style>
+        .signal-controls {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .signal-node-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(138, 43, 226, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .signal-node-card.selected {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(255, 20, 147, 0.1));
+        }
+        
+        .signal-param {
+            margin: 1rem 0;
+        }
+        
+        .signal-param label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .signal-param input {
+            width: 100%;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            color: white;
+        }
+        
+        .signal-nodes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            padding: 0 2rem;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        .step.active {
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .step.completed {
+            border-bottom-color: #4caf50;
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .step.active .step-number {
+            background: var(--primary-color);
+        }
+        
+        .step.completed .step-number {
+            background: #4caf50;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-traffic-light"></i>
+                <span>Smart Traffic</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/dashboard" class="nav-item">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/label-video" class="nav-item">
+                <i class="fas fa-video"></i>
+                <span>Label Video</span>
+            </a>
+            <a href="/optimize-signals" class="nav-item">
+                <i class="fas fa-brain"></i>
+                <span>Optimize Signals</span>
+            </a>
+            <a href="/uxsim-scenarios" class="nav-item">
+                <i class="fas fa-globe"></i>
+                <span>Real-World Scenarios</span>
+            </a>
+            <a href="/signal-tuning" class="nav-item active">
+                <i class="fas fa-sliders-h"></i>
+                <span>Signal Tuning</span>
+            </a>
+            <a href="#" class="nav-item disabled">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+                <span class="badge-small">Soon</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/dashboard" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="dashboard-header">
+            <h1>🚦 Signal Timing Optimization</h1>
+            <div class="breadcrumb">
+                <a href="/dashboard">Dashboard</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Signal Tuning</span>
+            </div>
+        </header>
+
+        <div class="uxsim-container">
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step active" id="step1">
+                    <div class="step-number">1</div>
+                    <div>Select Area</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-number">2</div>
+                    <div>Choose Signals</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-number">3</div>
+                    <div>Tune Parameters</div>
+                </div>
+                <div class="step" id="step4">
+                    <div class="step-number">4</div>
+                    <div>Run & Analyze</div>
+                </div>
+            </div>
+
+            <!-- Step 1: Select Area -->
+            <div class="step-content" id="stepContent1">
+                <h2>🗺️ Step 1: Select Area from Map</h2>
+                <div class="map-container">
+                    <div id="map"></div>
+                    <div class="map-instructions">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>How to use:</strong> Click the rectangle tool and drag to select your area of interest.
+                        Choose an urban area with multiple intersections for best results.
+                    </div>
+                    <div class="bounds-display" id="boundsDisplay" style="display: none;">
+                        <strong>Selected Bounds:</strong><br>
+                        North: <span id="boundNorth">-</span> | South: <span id="boundSouth">-</span><br>
+                        East: <span id="boundEast">-</span> | West: <span id="boundWest">-</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="loadNetwork()" id="loadNetworkBtn" disabled>
+                    <i class="fas fa-download"></i> Load Network
+                </button>
+            </div>
+
+            <!-- Step 2: Choose Signal Nodes -->
+            <div class="step-content" id="stepContent2" style="display: none;">
+                <h2>🚦 Step 2: Select Intersections for Signal Control</h2>
+                <p>We found <strong id="signalCount">0</strong> potential intersections (nodes with 3+ connections)</p>
+                <div class="signal-nodes-grid" id="signalNodesGrid"></div>
+                <button class="btn btn-primary" onclick="goToStep3()" id="configureBtn" disabled>
+                    <i class="fas fa-arrow-right"></i> Next: Configure Parameters
+                </button>
+            </div>
+
+            <!-- Step 3: Configure Signal Parameters -->
+            <div class="step-content" id="stepContent3" style="display: none;">
+                <h2>⚙️ Step 3: Configure Simulation Settings</h2>
+                
+                <!-- Mode Comparison Toggle -->
+                <div class="config-section" style="margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <input type="checkbox" id="enableModeComparison" style="width: auto;">
+                        <label for="enableModeComparison" style="margin: 0; font-size: 1.1rem; font-weight: bold;">
+                            🚕 Enable Transportation Mode Comparison
+                        </label>
+                    </div>
+                    <p style="color: #888; font-size: 0.9rem;">
+                        Compare impact of private cars vs rideshare services (Uber/Lyft/Ola) on traffic congestion
+                    </p>
+                </div>
+                
+                <div class="config-section">
+                    <h3>Basic Parameters</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label for="simDuration">Duration (seconds)</label>
+                            <input type="number" id="simDuration" value="3600" min="600" max="7200" step="600">
+                            <small>Simulation time (600s = 10min, 3600s = 1hr)</small>
+                        </div>
+                        <div class="config-item">
+                            <label for="simDemand">Total Traffic Demand (trips)</label>
+                            <input type="number" id="simDemand" value="2000" min="500" max="5000" step="500">
+                            <small>Total number of trips to simulate</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mode Comparison Parameters (hidden by default) -->
+                <div class="config-section" id="modeComparisonParams" style="display: none; margin-top: 2rem;">
+                    <h3>🚗 Transportation Mode Settings</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label for="ridesharePercent">
+                                Rideshare Users (%)
+                                <span id="ridesharePercentValue" style="color: var(--primary-color);">50%</span>
+                            </label>
+                            <input type="range" id="ridesharePercent" min="0" max="100" value="50" step="10"
+                                   oninput="document.getElementById('ridesharePercentValue').textContent = this.value + '%'">
+                            <small>Percentage of people using rideshare vs private cars</small>
+                        </div>
+                        <div class="config-item">
+                            <label for="numTaxis">
+                                Available Taxis
+                                <span id="numTaxisValue" style="color: var(--primary-color);">100</span>
+                            </label>
+                            <input type="range" id="numTaxis" min="20" max="500" value="100" step="20"
+                                   oninput="document.getElementById('numTaxisValue').textContent = this.value">
+                            <small>Number of rideshare vehicles in the network</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="goToStep4()">
+                    <i class="fas fa-arrow-right"></i> Next: Fine-Tune Signals
+                </button>
+            </div>
+
+            <!-- Step 4: Tune Signal Parameters & Run -->
+            <div class="step-content" id="stepContent4" style="display: none;">
+                <h2>🚦 Step 4: Fine-Tune Signal Timing & Run Simulation</h2>
+                <div id="signalConfigGrid"></div>
+                
+                <button class="btn btn-primary btn-large" onclick="runSimulation()">
+                    <i class="fas fa-play"></i> Run Simulation
+                </button>
+                
+                <!-- Results -->
+                <div id="resultsSection" style="display: none;">
+                    <h3>📊 Simulation Results</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="statTrips">-</div>
+                            <div class="stat-label">Completed Trips</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statAvgSpeed">-</div>
+                            <div class="stat-label">Avg Speed (m/s)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statAvgTime">-</div>
+                            <div class="stat-label">Avg Travel Time (s)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="visualizations" style="margin-top: 2rem;">
+                        <h3>Visualizations</h3>
+                        <div id="visualizationsGrid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" id="loadingText">Processing...</div>
+            <div class="loading-subtext" id="loadingSubtext"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="{{ url_for('static', filename='js/signal-tuning.js') }}"></script>
+</body>
+</html>

@@ -18,6 +18,7 @@ from config.settings import (
 from backend.api.video_routes import video_bp
 from backend.api.simulation_routes import simulation_bp, SUMO_AVAILABLE
 from backend.api.uxsim_routes import uxsim_bp
+from backend.api.signal_routes import signal_bp
 from backend.simulation.network_mgr import network_manager
 
 
@@ -38,6 +39,7 @@ def create_app():
     app.register_blueprint(video_bp)
     app.register_blueprint(simulation_bp)
     app.register_blueprint(uxsim_bp)
+    app.register_blueprint(signal_bp)
     
     # Main routes
     @app.route('/')
@@ -62,6 +64,10 @@ def create_app():
     @app.route('/uxsim-scenarios')
     def uxsim_scenarios_page():
         return render_template('uxsim_scenarios.html')
+    
+    @app.route('/signal-tuning')
+    def signal_tuning_page():
+        return render_template('signal_tuning.html')
     
     @app.route('/health')
     def health():
