@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Smart Traffic</title>
+    <title>Dashboard - gridsense</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,7 +14,7 @@
         <div class="sidebar-header">
             <div class="logo">
                 <i class="fas fa-traffic-light"></i>
-                <span>Smart Traffic</span>
+                <span>gridsense</span>
             </div>
         </div>
         <nav class="sidebar-nav">
@@ -38,15 +38,9 @@
                 <i class="fas fa-sliders-h"></i>
                 <span>Signal Tuning</span>
             </a>
-            <a href="#" class="nav-item disabled">
-                <i class="fas fa-chart-line"></i>
-                <span>Analytics</span>
-                <span class="badge-small">Soon</span>
-            </a>
-            <a href="#" class="nav-item disabled">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-                <span class="badge-small">Soon</span>
+            <a href="/api-docs" class="nav-item">
+                <i class="fas fa-code"></i>
+                <span>API Docs</span>
             </a>
         </nav>
         <div class="sidebar-footer">
@@ -203,43 +197,30 @@
                         </div>
                     </a>
 
-                    <div class="dashboard-feature-card disabled">
+                    <a href="/api-docs" class="dashboard-feature-card">
                         <div class="feature-card-header">
                             <div class="feature-card-icon">
-                                <i class="fas fa-chart-line"></i>
+                                <i class="fas fa-code"></i>
                             </div>
-                            <span class="status-badge coming">Coming Soon</span>
+                            <span class="status-badge active">Active</span>
                         </div>
-                        <h3>Traffic Analytics</h3>
-                        <p>Analyze traffic patterns, peak hours, and vehicle distribution with comprehensive data visualization.</p>
+                        <h3>API Documentation</h3>
+                        <p>Access our comprehensive REST API for video processing, traffic simulation, and signal optimization. Integrate with your applications.</p>
                         <div class="feature-card-footer">
                             <span class="feature-tag">
-                                <i class="fas fa-chart-bar"></i> Analytics
+                                <i class="fas fa-plug"></i> REST API
                             </span>
                             <span class="feature-tag">
-                                <i class="fas fa-calendar"></i> Historical
+                                <i class="fas fa-book"></i> Documented
                             </span>
                         </div>
-                    </div>
+                        <div class="card-action">
+                            <span>View API Docs</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
 
-                    <div class="dashboard-feature-card disabled">
-                        <div class="feature-card-header">
-                            <div class="feature-card-icon">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                            <span class="status-badge coming">Coming Soon</span>
-                        </div>
-                        <h3>Incident Detection</h3>
-                        <p>Automatically detect accidents, traffic violations, and unusual events in real-time video streams.</p>
-                        <div class="feature-card-footer">
-                            <span class="feature-tag">
-                                <i class="fas fa-bell"></i> Alerts
-                            </span>
-                            <span class="feature-tag">
-                                <i class="fas fa-clock"></i> Real-time
-                            </span>
-                        </div>
-                    </div>
+                    <!-- Incident Detection feature removed per request -->
                 </div>
             </div>
 

@@ -1,5 +1,5 @@
 """
-Smart Traffic Management System - Main Application
+gridsense - Main Application
 Reorganized structure with modular components
 """
 
@@ -69,6 +69,10 @@ def create_app():
     def signal_tuning_page():
         return render_template('signal_tuning.html')
     
+    @app.route('/api-docs')
+    def api_docs_page():
+        return render_template('api_docs.html')
+    
     @app.route('/health')
     def health():
         """Health check endpoint"""
@@ -85,7 +89,7 @@ if __name__ == '__main__':
     app = create_app()
     print(f"""
     ╔══════════════════════════════════════════════════════════════╗
-    ║  Smart Traffic Management System                             ║
+    ║  gridsense                                                  ║
     ║  Server starting on http://{HOST}:{PORT}                   ║
     ║  SUMO-RL Available: {str(SUMO_AVAILABLE).ljust(41)}║
     ╚══════════════════════════════════════════════════════════════╝

@@ -1,4 +1,4 @@
-# Smart Traffic Management System
+# gridsense
 
 An AI-powered web application for traffic video analysis and traffic signal optimization using machine learning and reinforcement learning.
 
@@ -213,7 +213,6 @@ Download processed video
 ## Features Coming Soon
 
 - 📊 Traffic Analytics - Analyze patterns and peak hours
-- 🚨 Incident Detection - Automatic accident and violation detection
 - 🔍 Vehicle Tracking - Track individual vehicles across cameras
 - 📈 Historical Data - Track and compare traffic over time
 
@@ -264,6 +263,4 @@ This project is created for educational and demonstration purposes.
 - **Icons**: Font Awesome
 - **Fonts**: Segoe UI
 
----
 
-Made with ❤️ for Smart Traffic Management

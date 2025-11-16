@@ -1,5 +1,5 @@
 """
-Configuration settings for Smart Traffic Management System
+Configuration settings for gridsense
 """
 
 import os

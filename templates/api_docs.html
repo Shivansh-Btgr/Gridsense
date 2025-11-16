@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - gridsense</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .api-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .api-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 2px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .api-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .api-endpoint {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--primary-color);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .api-endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .http-method {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .method-get { background: #61affe; color: #fff; }
+        .method-post { background: #49cc90; color: #fff; }
+        .method-put { background: #fca130; color: #fff; }
+        .method-delete { background: #f93e3e; color: #fff; }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .api-description {
+            color: #ccc;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: #0d0d1a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #a9b7c6;
+        }
+
+        .param-table {
+            width: 100%;
+            margin: 1rem 0;
+            border-collapse: collapse;
+        }
+
+        .param-table th,
+        .param-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .param-table th {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .param-table code {
+            background: rgba(138, 43, 226, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .response-example {
+            margin-top: 1rem;
+        }
+
+        .response-example h4 {
+            color: #4caf50;
+            margin-bottom: 0.5rem;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: rgba(138, 43, 226, 0.2);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .base-url {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 20, 147, 0.2));
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .base-url h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .base-url code {
+            font-size: 1.2rem;
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+                <div class="logo">
+                <i class="fas fa-traffic-light"></i>
+                <span>gridsense</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/dashboard" class="nav-item">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/label-video" class="nav-item">
+                <i class="fas fa-video"></i>
+                <span>Label Video</span>
+            </a>
+            <a href="/optimize-signals" class="nav-item">
+                <i class="fas fa-brain"></i>
+                <span>Optimize Signals</span>
+            </a>
+            <a href="/uxsim-scenarios" class="nav-item">
+                <i class="fas fa-globe"></i>
+                <span>Real-World Scenarios</span>
+            </a>
+            <a href="/signal-tuning" class="nav-item">
+                <i class="fas fa-sliders-h"></i>
+                <span>Signal Tuning</span>
+            </a>
+            <a href="/api-docs" class="nav-item active">
+                <i class="fas fa-code"></i>
+                <span>API Docs</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/dashboard" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="dashboard-header">
+            <h1>API Documentation</h1>
+            <div class="user-info">
+                <i class="fas fa-code"></i>
+                <span>Developer Resources</span>
+            </div>
+        </header>
+
+        <div class="api-container">
+            <!-- Introduction -->
+            <div class="base-url">
+                <h3><i class="fas fa-server"></i> Base URL</h3>
+                <code>http://localhost:5000/api</code>
+                <p style="margin-top: 1rem; color: #888;">All API endpoints are relative to this base URL. Authentication is not required for local development.</p>
+            </div>
+
+            <!-- Video Processing API -->
+            <div class="api-section">
+                <h2><i class="fas fa-video"></i> Video Processing</h2>
+                <p>Upload and process traffic videos with AI-powered vehicle detection and tracking.</p>
+
+                <!-- Upload Video -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="http-method method-post">POST</span>
+                        <span class="endpoint-path">/video/upload</span>
+                    </div>
+                    <p class="api-description">Upload a video file for processing. Supports MP4, AVI, MOV formats.</p>
+                    
+                    <div class="tag">Multipart Form Data</div>
+                    <div class="tag">Max Size: 500MB</div>
+
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>video</code></td>
+                                <td>File</td>
+                                <td>Yes</td>
+                                <td>Video file to process</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="response-example">
+                        <h4>Success Response (200 OK)</h4>
+                        <div class="code-block">
+                            <pre>{
+  "video_id": "abc123",
+  "filename": "traffic_video.mp4",
+  "message": "Video uploaded successfully"
+}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Process Video -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="http-method method-post">POST</span>
+                        <span class="endpoint-path">/video/process</span>
+                    </div>
+                    <p class="api-description">Process uploaded video with YOLO object detection and track vehicles.</p>
+
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>video_id</code></td>
+                                <td>String</td>
+                                <td>Yes</td>
+                                <td>ID from upload response</td>
+                            </tr>
+                            <tr>
+                                <td><code>model</code></td>
+                                <td>String</td>
+                                <td>No</td>
+                                <td>YOLO model (default: yolov8n)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="response-example">
+                        <h4>Success Response (200 OK)</h4>
+                        <div class="code-block">
+                            <pre>{
+  "status": "success",
+  "output_path": "outputs/processed_abc123.mp4",
+  "detections": 1523,
+  "processing_time": 45.2
+}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Download Processed Video -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="http-method method-get">GET</span>
+                        <span class="endpoint-path">/video/download/{filename}</span>
+                    </div>
+                    <p class="api-description">Download processed video or animation file.</p>
+
+                    <div class="response-example">
+                        <h4>Example</h4>
+                        <div class="code-block">
+                            <pre>GET /api/video/download/processed_abc123.mp4</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUMO Signal Optimization API -->
+            <div class="api-section">
+                <h2><i class="fas fa-brain"></i> Signal Optimization (SUMO-RL)</h2>
+                <p>Train and evaluate reinforcement learning agents for traffic signal control using SUMO simulation.</p>
+
+                <!-- Train Agent -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="http-method method-post">POST</span>
+                        <span class="endpoint-path">/simulation/train</span>
+                    </div>
+                    <p class="api-description">Train a reinforcement learning agent on a selected traffic scenario.</p>
+
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>scenario</code></td>
+                                <td>String</td>
+                                <td>Yes</td>
+                                <td>Scenario name (single-intersection, grid-4x4, etc.)</td>
+                            </tr>
+                            <tr>
+                                <td><code>episodes</code></td>
+                                <td>Integer</td>
+                                <td>No</td>
+                                <td>Training episodes (default: 100)</td>
+                            </tr>
+                            <tr>
+                                <td><code>algorithm</code></td>
+                                <td>String</td>
+                                <td>No</td>
+                                <td>RL algorithm (default: dqn)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="response-example">
+                        <h4>Success Response (200 OK)</h4>
+                        <div class="code-block">
+                            <pre>{
+  "status": "training_started",
+  "task_id": "train_xyz789",
+  "scenario": "single-intersection",
+  "episodes": 100
+}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evaluate Agent -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="http-method method-post">POST</span>
+                        <span class="endpoint-path">/simulation/evaluate</span>
+                    </div>
+                    <p class="api-description">Evaluate trained agent and compare with fixed-time control.</p>
+
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>scenario</code></td>
+                                <td>String</td>
+                                <td>Yes</td>
+                                <td>Scenario name</td>
+                            </tr>
+                            <tr>
+                                <td><code>agent_path</code></td>
+                                <td>String</td>
+                                <td>Yes</td>
+                                <td>Path to trained agent model</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="response-example">
+                        <h4>Success Response (200 OK)</h4>
+                        <div class="code-block">
+                            <pre>{
+  "rl_metrics": {
+    "avg_waiting_time": 42.3,
+    "throughput": 1250
+  },
+  "fixed_metrics": {
+    "avg_waiting_time": 68.5,
+    "throughput": 980
+  },
+  "improvement": "38.2%"
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UXsim Real-World Scenarios API -->
+            <div class="api-section">
+                <h2><i class="fas fa-globe"></i> Real-World Scenarios (UXsim)</h2>
+                <p>Simulate traffic on real road networks imported from OpenStreetMap.</p>
+
+                <!-- Run Preset Scenario -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="http-method method-post">POST</span>
+                        <span class="endpoint-path">/uxsim/run-preset</span>
+                    </div>
+                    <p class="api-description">Run simulation on preset city locations.</p>
+
+                    <div class="tag">Cities: Tokyo, Mumbai, London, NYC, Singapore, Berlin</div>
+
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>location</code></td>
+                                <td>String</td>
+                                <td>Yes</td>
+                                <td>City name (tokyo, mumbai, london, etc.)</td>
+                            </tr>
+                            <tr>
+                                <td><code>duration</code></td>
+                                <td>Integer</td>
+                                <td>No</td>
+                                <td>Simulation time in seconds (default: 3600)</td>
+                            </tr>
+                            <tr>
+                                <td><code>demand</code></td>
+                                <td>Integer</td>
+                                <td>No</td>
+                                <td>Total trips to simulate (default: 2000)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="response-example">
+                        <h4>Success Response (200 OK)</h4>
+                        <div class="code-block">
+                            <pre>{
+  "status": "success",
+  "location": "tokyo",
+  "network_stats": {
+    "nodes": 245,
+    "links": 512
+  },
+  "results": {
+    "total_trips": 2000,
+    "average_speed": 8.5,
+    "average_travel_time": 420.3
+  },
+  "animation": "uxsim_tokyo_20241104.gif"
+}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Run Custom Area -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="http-method method-post">POST</span>
+                        <span class="endpoint-path">/uxsim/run-custom</span>
+                    </div>
+                    <p class="api-description">Run simulation on custom map area using bounding box coordinates.</p>
+
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>north</code></td>
+                                <td>Float</td>
+                                <td>Yes</td>
+                                <td>Northern latitude</td>
+                            </tr>
+                            <tr>
+                                <td><code>south</code></td>
+                                <td>Float</td>
+                                <td>Yes</td>
+                                <td>Southern latitude</td>
+                            </tr>
+                            <tr>
+                                <td><code>east</code></td>
+                                <td>Float</td>
+                                <td>Yes</td>
+                                <td>Eastern longitude</td>
+                            </tr>
+                            <tr>
+                                <td><code>west</code></td>
+                                <td>Float</td>
+                                <td>Yes</td>
+                                <td>Western longitude</td>
+                            </tr>
+                            <tr>
+                                <td><code>duration</code></td>
+                                <td>Integer</td>
+                                <td>No</td>
+                                <td>Simulation duration (default: 3600)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="response-example">
+                        <h4>Example Request</h4>
+                        <div class="code-block">
+                            <pre>{
+  "north": 35.6850,
+  "south": 35.6800,
+  "east": 139.7670,
+  "west": 139.7600,
+  "duration": 3600,
+  "demand": 2000
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signal Tuning API -->
+            <div class="api-section">
+                <h2><i class="fas fa-sliders-h"></i> Signal Timing Tuner</h2>
+                <p>Fine-tune traffic signal parameters on real intersections and compare transportation modes.</p>
+
+                <!-- Load Network -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="http-method method-post">POST</span>
+                        <span class="endpoint-path">/signal/load-network</span>
+                    </div>
+                    <p class="api-description">Load OSM network and detect signal-controlled intersections.</p>
+
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>bounds</code></td>
+                                <td>Object</td>
+                                <td>Yes</td>
+                                <td>Bounding box {north, south, east, west}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="response-example">
+                        <h4>Success Response (200 OK)</h4>
+                        <div class="code-block">
+                            <pre>{
+  "status": "success",
+  "network_size": {
+    "nodes": 156,
+    "links": 342
+  },
+  "signal_candidates": [
+    {
+      "node_id": 568283974,
+      "lat": 35.6825,
+      "lon": 139.7635,
+      "connections": 4
+    }
+  ]
+}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Run Signal Optimization -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="http-method method-post">POST</span>
+                        <span class="endpoint-path">/signal/run-optimization</span>
+                    </div>
+                    <p class="api-description">Run simulation with custom signal timing parameters.</p>
+
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>signal_settings</code></td>
+                                <td>Array</td>
+                                <td>Yes</td>
+                                <td>Array of signal configurations</td>
+                            </tr>
+                            <tr>
+                                <td><code>duration</code></td>
+                                <td>Integer</td>
+                                <td>Yes</td>
+                                <td>Simulation duration in seconds</td>
+                            </tr>
+                            <tr>
+                                <td><code>demand</code></td>
+                                <td>Integer</td>
+                                <td>Yes</td>
+                                <td>Total traffic demand</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="response-example">
+                        <h4>Example Request</h4>
+                        <div class="code-block">
+                            <pre>{
+  "signal_settings": [
+    {
+      "node_id": 568283974,
+      "cycle": 120,
+      "green_time": 60,
+      "offset": 0
+    }
+  ],
+  "duration": 3600,
+  "demand": 2000
+}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mode Comparison -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="http-method method-post">POST</span>
+                        <span class="endpoint-path">/signal/run-mode-comparison</span>
+                    </div>
+                    <p class="api-description">Compare private cars vs rideshare impact on traffic congestion.</p>
+
+                    <div class="tag">Private Cars</div>
+                    <div class="tag">Rideshare (Uber/Lyft/Ola)</div>
+                    <div class="tag">Side-by-Side Comparison</div>
+
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>signal_settings</code></td>
+                                <td>Array</td>
+                                <td>Yes</td>
+                                <td>Signal configurations</td>
+                            </tr>
+                            <tr>
+                                <td><code>duration</code></td>
+                                <td>Integer</td>
+                                <td>Yes</td>
+                                <td>Simulation duration</td>
+                            </tr>
+                            <tr>
+                                <td><code>demand</code></td>
+                                <td>Integer</td>
+                                <td>Yes</td>
+                                <td>Total traffic demand</td>
+                            </tr>
+                            <tr>
+                                <td><code>rideshare_percent</code></td>
+                                <td>Integer</td>
+                                <td>Yes</td>
+                                <td>Percentage using rideshare (0-100)</td>
+                            </tr>
+                            <tr>
+                                <td><code>num_taxis</code></td>
+                                <td>Integer</td>
+                                <td>Yes</td>
+                                <td>Number of rideshare vehicles (20-500)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="response-example">
+                        <h4>Success Response (200 OK)</h4>
+                        <div class="code-block">
+                            <pre>{
+  "scenarios": {
+    "private_only": {
+      "mode_name": "Private Cars Only",
+      "total_trips": 2000,
+      "average_speed": 7.2,
+      "average_travel_time": 485.3,
+      "total_vehicles": 2000
+    },
+    "mixed": {
+      "mode_name": "Mixed Mode (50% Rideshare)",
+      "total_trips": 2000,
+      "average_speed": 8.5,
+      "average_travel_time": 412.1,
+      "rideshare_trips": 1000,
+      "private_cars": 1000,
+      "num_taxis": 100
+    }
+  },
+  "comparison": {
+    "winner": "mixed",
+    "metrics": {
+      "speed_improvement": 18.1,
+      "time_reduction": 15.1,
+      "vehicle_reduction": 45.0
+    }
+  }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Utility Endpoints -->
+            <div class="api-section">
+                <h2><i class="fas fa-tools"></i> Utility</h2>
+                
+                <!-- Health Check -->
+                <div class="api-endpoint">
+                    <div class="api-endpoint-header">
+                        <span class="http-method method-get">GET</span>
+                        <span class="endpoint-path">/health</span>
+                    </div>
+                    <p class="api-description">Check API health and availability.</p>
+
+                    <div class="response-example">
+                        <h4>Success Response (200 OK)</h4>
+                        <div class="code-block">
+                            <pre>{
+  "status": "healthy",
+  "sumo_available": true,
+  "version": "1.0.0"
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rate Limits & Notes -->
+            <div class="api-section">
+                <h2><i class="fas fa-info-circle"></i> Notes & Best Practices</h2>
+                
+                <h3 style="color: var(--primary-color); margin-top: 2rem;">Rate Limits</h3>
+                <p>No rate limits for local development. Production deployment will enforce rate limiting.</p>
+
+                <h3 style="color: var(--primary-color); margin-top: 2rem;">File Size Limits</h3>
+                <ul style="line-height: 2;">
+                    <li>Video uploads: Maximum 500MB</li>
+                    <li>Request timeout: 5 minutes for long-running simulations</li>
+                </ul>
+
+                <h3 style="color: var(--primary-color); margin-top: 2rem;">Error Codes</h3>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>400</code></td>
+                            <td>Bad Request - Invalid parameters</td>
+                        </tr>
+                        <tr>
+                            <td><code>404</code></td>
+                            <td>Not Found - Resource doesn't exist</td>
+                        </tr>
+                        <tr>
+                            <td><code>500</code></td>
+                            <td>Internal Server Error - Server-side issue</td>
+                        </tr>
+                        <tr>
+                            <td><code>503</code></td>
+                            <td>Service Unavailable - SUMO not installed</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="color: var(--primary-color); margin-top: 2rem;">Example: Complete Workflow</h3>
+                <div class="code-block">
+                    <pre># 1. Upload video
+curl -X POST http://localhost:5000/api/video/upload \
+  -F "video=@traffic.mp4"
+
+# 2. Process video
+curl -X POST http://localhost:5000/api/video/process \
+  -H "Content-Type: application/json" \
+  -d '{"video_id": "abc123", "model": "yolov8n"}'
+
+# 3. Run UXsim simulation
+curl -X POST http://localhost:5000/api/uxsim/run-preset \
+  -H "Content-Type: application/json" \
+  -d '{"location": "tokyo", "duration": 3600, "demand": 2000}'
+
+# 4. Mode comparison
+curl -X POST http://localhost:5000/api/signal/run-mode-comparison \
+  -H "Content-Type: application/json" \
+  -d '{
+    "signal_settings": [...],
+    "duration": 3600,
+    "demand": 2000,
+    "rideshare_percent": 50,
+    "num_taxis": 100
+  }'</pre>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
